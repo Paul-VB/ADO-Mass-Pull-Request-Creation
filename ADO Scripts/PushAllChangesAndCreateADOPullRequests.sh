@@ -20,8 +20,6 @@ declare sourceBranchNameStripped=$sourceBranchName
 sourceBranchNameStripped="${sourceBranchNameStripped//,/_}"
 sourceBranchNameStripped="${sourceBranchNameStripped// /_}"
 
-echo "$sourceBranchNameStripped"
-
 #check if we recieved the git commit message as an argument
 if [[ -z $2 ]];
 then
@@ -29,6 +27,9 @@ then
 else
     commitMessage=$2
 fi
+
+echo "source branch name: $sourceBranchNameStripped"
+echo "commit message: $commitMessage"
 
 #waits for the user to press the any key
 read -r -p "Press the any key to continue " input
