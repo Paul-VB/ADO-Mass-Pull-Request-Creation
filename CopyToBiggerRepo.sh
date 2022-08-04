@@ -1,5 +1,5 @@
 #!/bin/bash
-declare fileThatHoldsTargetPath="documentationFolderPath.txt"
+declare fileThatHoldsTargetPath="biggerRepoPath.txt"
 declare targetPath=`cat $fileThatHoldsTargetPath`
 declare tempFolderName="TemporaryFolder_dsuifgh5d"
 eval "git clone ./ '$tempFolderName'"
