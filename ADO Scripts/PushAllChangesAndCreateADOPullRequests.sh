@@ -4,7 +4,7 @@ declare scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd 
 declare currDate=`date +"%Y-%m-%d_%H-%M-%S"`
 gitRoot="C:\Git"
 
-#given avariable, return that variable if it is not empty.
+#given a variable, return that variable if it is not empty.
 #If it is empty, prompt the user to enter it with a custom message
 function promptUserForValueIfEmpty(){
     #check if we actually recieved the cli argument
