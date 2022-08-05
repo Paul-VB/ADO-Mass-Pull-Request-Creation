@@ -32,9 +32,10 @@ function getDefaultBranchName(){
     echo "$(eval "git symbolic-ref --short HEAD")"
 }
 
-#given a string, return that string
+#this is the source branch name that all our commits will use
 sourceBranchName=$(promptUserForValueIfEmpty "$1" "Please Enter your source branch name: ")
 sourceBranchName=$(createValidGitBranchName "$sourceBranchName")
+
 #this will be what we use as the commit message for all our git commits
 commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message: ")
 
