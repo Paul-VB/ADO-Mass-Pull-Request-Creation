@@ -1,4 +1,4 @@
-
+#!/bin/bash
 for d in */ ; do 
     eval cd \"$d\";
 	if [ -d .git ]; then
