@@ -1,8 +1,8 @@
 #!/bin/bash
 
-declare scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
-declare currDate=`date +"%Y-%m-%d_%H-%M-%S"`
-gitRoot="C:\Git"
+declare scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
+declare currDate=`date +"%Y-%m-%d_%H-%M-%S"`;
+gitRoot="C:\Git";
 
 #given a variable, return that variable if it is not empty.
 #If it is empty, prompt the user to enter it with a custom message
@@ -10,7 +10,7 @@ function promptUserForValueIfEmpty(){
     #check if we actually recieved the cli argument
     if [ -z "$1" ];
     then
-        read -p "$2" result
+        read -r -p "$2" result
         echo "$result"
     else
         echo "$1"
@@ -42,7 +42,7 @@ commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message
 echo "the source branch name is: $sourceBranchName"
 echo "the commit message is: $commitMessage"
 
-#whatt the default branchName
+#what the default branchName
 defaultBranchName=$(getDefaultBranchName)
 
 echo "the default branch name is $defaultBranchName"
