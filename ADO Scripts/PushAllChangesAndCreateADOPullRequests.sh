@@ -1,8 +1,9 @@
 #!/bin/bash
 
+
 declare scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 declare currDate=`date +"%Y-%m-%d_%H-%M-%S"`;
-gitRoot="C:\Git";
+gitRoot="H:\git";
 
 #given a variable, return that variable if it is not empty.
 #If it is empty, prompt the user to enter it with a custom message
@@ -48,6 +49,14 @@ defaultBranchName=$(getDefaultBranchName)
 echo "the default branch name is $defaultBranchName"
 
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
+eval cd \"$gitRoot\" || { exit; };
+for currDirectory in */ ; do 
+    eval cd  \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
+	if [ -d .git ]; then
+		echo "$currDirectory is a git repo!";
+	fi
+    cd ..; 
+done 
 
 
 #in the current git repo, try to make a new branch with the name of the source branch
