@@ -30,7 +30,7 @@ NoColor="\033[0m";
 
 declare scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 declare currDate=`date +"%Y-%m-%d_%H-%M-%S"`;
-gitRoot="H:\git";
+gitRoot="C:\git";
 
 #given a variable, return that variable if it is not empty.
 #If it is empty, prompt the user to enter it with a custom message
