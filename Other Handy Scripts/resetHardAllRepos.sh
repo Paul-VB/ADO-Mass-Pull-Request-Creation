@@ -1,4 +1,6 @@
 #!/bin/bash
+gitRoot="C:\git";
+eval cd \"$gitRoot\";
 for d in */ ; do 
     eval cd \"$d\";
 	if [ -d .git ]; then
