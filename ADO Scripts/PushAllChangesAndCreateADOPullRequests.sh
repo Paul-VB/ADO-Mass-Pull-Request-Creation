@@ -84,17 +84,24 @@ for currDirectory in */ ; do
         #we know we're in a git repo. Does the git repo have unmerged changes?
         if output=$(git status --porcelain) && [ -z "$output" ]; then
 			# Working directory clean
-			echo -ne $LightGreen"$currDirectory has no changes"$NoColor;
+            echo -ne $LightGreen"\r\033[0K$currDirectory has no changes"$NoColor;
+			#echo -e $LightGreen"$currDirectory has no changes"$NoColor;
 		else 
 			# Uncommitted changes
-			echo -e $LightRed"$currDirectory has changes"$NoColor;
+			echo -e $LightRed"\r\033[0K$currDirectory has changes"$NoColor;
 			ReposWithChanges+=("$currDirectory")
 		fi
 	fi
     cd ..; 
 done 
+
 declare ReposWithChangesCount=${#ReposWithChanges[*]}
-echo "ReposWithChangesCount is $ReposWithChangesCount"
+
+if ["$ReposWithChangesCount" == 0]; then
+    echo -e "All repos are clean!";
+else
+    echo -e "some repos are dirty";
+fi
 
 
 #in the current git repo, try to make a new branch with the name of the source branch
