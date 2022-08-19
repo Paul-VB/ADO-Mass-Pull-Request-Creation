@@ -75,29 +75,47 @@ defaultBranchName=$(getDefaultBranchName)
 
 echo "the default branch name is $defaultBranchName"
 
-#now we analyze all the folders in the git base folder to see which of them are actually git repos
+declare -a gitRepoHasUnmergedChanges
 declare -a ReposWithChanges
-eval cd \"$gitRoot\" || { exit; };
-for currDirectory in */ ; do 
-    eval cd  \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
+#this function checks a directory, and if it's a git repo with unmerged changes, add that directory to gitRepoHasUnmergedChanges
+function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
+    currDirectory=${1::-1}
+    eval cd \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
 	if [ -d .git ]; then
         #we know we're in a git repo. Does the git repo have unmerged changes?
         if output=$(git status --porcelain) && [ -z "$output" ]; then
 			# Working directory clean
             echo -ne $LightGreen"\r\033[0K$currDirectory has no changes"$NoColor;
+            gitRepoHasUnmergedChanges[$currDirectory]=false
 			#echo -e $LightGreen"$currDirectory has no changes"$NoColor;
 		else 
 			# Uncommitted changes
 			echo -e $LightRed"\r\033[0K$currDirectory has changes"$NoColor;
-			ReposWithChanges+=("$currDirectory")
+			gitRepoHasUnmergedChanges[$currDirectory]=true
 		fi
 	fi
     cd ..; 
+}
+
+#now we analyze all the folders in the git base folder to see which of them are actually git repos
+eval cd \"$gitRoot\" || { exit; };
+for currDirectory in */ ; do 
+    #haha parallelization go brr
+    checkIfDirectoryIsGitRepoWithUnmergedChanges $currDirectory &
 done 
+wait
+for repo in ${!gitRepoHasUnmergedChanges[@]} ; do 
+    if [ "$gitRepoHasUnmergedChanges[$repo]" = true  ]; then
+        ReposWithChanges+=("$repo")
+    fi
+done 
+echo -e "\nChecked all repos";
 
 declare ReposWithChangesCount=${#ReposWithChanges[*]}
 
-if ["$ReposWithChangesCount" == 0]; then
+echo "ReposWithChangesCount is $ReposWithChangesCount"
+
+if [[ "$ReposWithChangesCount" -eq "0" ]]; then
     echo -e "All repos are clean!";
 else
     echo -e "some repos are dirty";
