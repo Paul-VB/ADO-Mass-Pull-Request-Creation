@@ -76,14 +76,25 @@ defaultBranchName=$(getDefaultBranchName)
 echo "the default branch name is $defaultBranchName"
 
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
+declare -a ReposWithChanges
 eval cd \"$gitRoot\" || { exit; };
 for currDirectory in */ ; do 
     eval cd  \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
 	if [ -d .git ]; then
-		echo "$currDirectory is a git repo!";
+        #we know we're in a git repo. Does the git repo have unmerged changes?
+        if output=$(git status --porcelain) && [ -z "$output" ]; then
+			# Working directory clean
+			echo -ne $LightGreen"$currDirectory has no changes"$NoColor;
+		else 
+			# Uncommitted changes
+			echo -e $LightRed"$currDirectory has changes"$NoColor;
+			ReposWithChanges+=("$currDirectory")
+		fi
 	fi
     cd ..; 
 done 
+declare ReposWithChangesCount=${#ReposWithChanges[*]}
+echo "ReposWithChangesCount is $ReposWithChangesCount"
 
 
 #in the current git repo, try to make a new branch with the name of the source branch
