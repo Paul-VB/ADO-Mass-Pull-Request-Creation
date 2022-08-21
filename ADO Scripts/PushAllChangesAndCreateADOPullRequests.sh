@@ -32,6 +32,10 @@ declare scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd 
 declare currDate=`date +"%Y-%m-%d_%H-%M-%S"`;
 gitRoot="C:\git";
 
+#for the sake of clarity, i'll make a globalish var here to point to where we're gonna store our temporary files
+#on linux,  is a directory that lives purely in ram, so there should be better performance
+tempDir="/tmp"
+
 #given a variable, return that variable if it is not empty.
 #If it is empty, prompt the user to enter it with a custom message
 function promptUserForValueIfEmpty(){
@@ -75,26 +79,23 @@ defaultBranchName=$(getDefaultBranchName)
 
 echo "the default branch name is $defaultBranchName"
 
-declare -a gitRepoHasUnmergedChanges
-declare -a ReposWithChanges
+touch "$tempDir/ReposWithChangesTmpFile"
 #this function checks a directory, and if it's a git repo with unmerged changes, add that directory to gitRepoHasUnmergedChanges
 function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
-    currDirectory=${1::-1}
+    local currDirectory=${1::-1}
     eval cd \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
 	if [ -d .git ]; then
         #we know we're in a git repo. Does the git repo have unmerged changes?
         if output=$(git status --porcelain) && [ -z "$output" ]; then
 			# Working directory clean
             echo -ne $LightGreen"\r\033[0K$currDirectory has no changes"$NoColor;
-            gitRepoHasUnmergedChanges[$currDirectory]=false
-			#echo -e $LightGreen"$currDirectory has no changes"$NoColor;
 		else 
 			# Uncommitted changes
 			echo -e $LightRed"\r\033[0K$currDirectory has changes"$NoColor;
-			gitRepoHasUnmergedChanges[$currDirectory]=true
+			echo "$currDirectory" >> "$tempDir/ReposWithChangesTmpFile"
 		fi
 	fi
-    cd ..; 
+	cd ..; 
 }
 
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
@@ -104,12 +105,12 @@ for currDirectory in */ ; do
     checkIfDirectoryIsGitRepoWithUnmergedChanges $currDirectory &
 done 
 wait
-for repo in ${!gitRepoHasUnmergedChanges[@]} ; do 
-    if [ "$gitRepoHasUnmergedChanges[$repo]" = true  ]; then
-        ReposWithChanges+=("$repo")
-    fi
+mapfile -t ReposWithChanges < "$tempDir/ReposWithChangesTmpFile"
+for repo in "${ReposWithChanges[@]}" ; do 
+	echo "$repo"
 done 
 echo -e "\nChecked all repos";
+rm "$tempDir/ReposWithChangesTmpFile"
 
 declare ReposWithChangesCount=${#ReposWithChanges[*]}
 
