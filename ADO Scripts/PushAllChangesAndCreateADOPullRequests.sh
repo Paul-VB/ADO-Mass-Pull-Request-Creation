@@ -61,7 +61,7 @@ function createValidGitBranchName(){
 
 #get the default branch name of the current repository
 function getDefaultBranchName(){
-    echo "$(eval "git symbolic-ref --short HEAD")"
+    echo "$(eval "git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'")"
 }
 
 #this is the source branch name that all our commits will use
