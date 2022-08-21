@@ -33,7 +33,6 @@ declare currDate=`date +"%Y-%m-%d_%H-%M-%S"`;
 gitRoot="C:\git";
 
 #for the sake of clarity, i'll make a globalish var here to point to where we're gonna store our temporary files
-#on linux,  is a directory that lives purely in ram, so there should be better performance
 tempDir="/tmp"
 
 #given a variable, return that variable if it is not empty.
@@ -96,6 +95,10 @@ function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
 		fi
 	fi
 	cd ..; 
+}
+
+function createBranchAndPullRequest(){
+	local currDirectory=${1::-1}
 }
 
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
