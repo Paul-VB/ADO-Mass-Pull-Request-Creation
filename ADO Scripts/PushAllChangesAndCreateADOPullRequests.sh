@@ -119,7 +119,7 @@ function getSimilarButUnusedNewBranchName (){
     local branchName=${1}
     # declare -a similarBranches=($(git ls-remote | grep $branchName))
     # declare -a similarBranches=($(git ls-remote --exit-code --heads origin $branchName))
-    declare -a similarBranches=($(git branch -r | grep $branchName))
+    declare -a similarBranches=($(git branch -a | grep $branchName))
     declare similarBranchesCount=${#similarBranches[*]}
 
     if [[ ${#similarBranches[*]} -eq "0" ]]; then
