@@ -35,6 +35,13 @@ gitRoot="C:\git";
 #for the sake of clarity, i'll make a globalish var here to point to where we're gonna store our temporary files
 tempDir="/tmp"
 
+#sets the title of the terminal window
+function setTerminalTitle(){
+    echo -ne "\e]0;${1}\a"
+}
+
+setTerminalTitle "Push All Changes"
+
 #given a variable, return that variable if it is not empty.
 #If it is empty, prompt the user to enter it with a custom message
 function promptUserForValueIfEmpty(){
@@ -106,9 +113,14 @@ function getSimilarButUnusedNewBranchName(){
     local repo=${2}
     echo "For Repo $repo, Checking if there are any existsing remote branch names by the name $branchName"
     #declare -a similarBranches=($(git ls-remote | grep $branchName))
-    declare -a similarBranches=($(git ls-remote --exit-code --heads origin $branchName))
+    #declare -a similarBranches=($(git ls-remote --exit-code --heads origin $branchName))
+    declare -a similarBranches=($(git branch -r | grep $branchName))
     declare similarBranchesCount=${#similarBranches[*]}
-    echo "repo $repo has: $similarBranchesCount remote branches with a similar name to $branchName"
+    echo "repo $repo has $similarBranchesCount similar branches"
+    for branches in ${similarBranches[@]}; do
+        echo "repo $repo has a similar branch name: $branches"
+    done
+
 }
 
 #this is the source branch name that all our commits will use
