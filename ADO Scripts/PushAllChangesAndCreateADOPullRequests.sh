@@ -100,17 +100,16 @@ function createBranchAndPushToRemote(){
     #first, lets get a branch name that is not already in use
     local uniqueBranchName=$(getSimilarButUnusedNewBranchName $sourceBranchName)
 
-    #echo "For repo $repo, a unique branch name of $uniqueBranchName is avalible";
-    return 1
     #next, lets create the new branch. If any errors happen, dont go any further
-    # eval "git checkout -b '$uniqueBranchName'"
-    # if [ $? -neq 0 ]; then
-    #     echo "ERROR: for git repo $repo, $uniqueBranchName is not a valid branch name" 1>&2
-    #     return 1        
-    # fi
-    # #if that went well, continue
-    # eval "git commit -a -m '${commitMessage}'"
-    # eval "git push origin $uniqueBranchName"
+    eval "git checkout -b '$uniqueBranchName'"
+    if [ $? -neq 0 ]; then
+        echo "ERROR: for git repo $repo, $uniqueBranchName is not a valid branch name" 1>&2
+        return 1        
+    fi
+    #if that went well, continue
+    eval "git commit -a -m '${commitMessage}'"
+    eval "git push origin $uniqueBranchName"
+    return 0
 }
 
 #In the current git repo we're in, check if the supplied branch name already exists remotley.
