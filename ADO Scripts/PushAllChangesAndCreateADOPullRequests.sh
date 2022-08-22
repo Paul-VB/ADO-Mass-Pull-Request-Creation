@@ -136,9 +136,9 @@ function getSimilarButUnusedNewBranchName (){
 }
 
 #in the current git repo
-function createADOPullRequest(){
+# function createADOPullRequest(){
 
-}
+# }
 
 #this is the source branch name that all our commits will use
 sourceBranchName=$(promptUserForValueIfEmpty "$1" "Please Enter your source branch name: ")
