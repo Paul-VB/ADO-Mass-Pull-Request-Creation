@@ -152,7 +152,7 @@ function branchAndCreatePR(){
 	local repo=${1}
     eval cd \"$repo\" || { true; };
     createBranchAndPushToRemote
-    #createADOPullRequest
+    createADOPullRequest
     cd ..; 
 }
 
