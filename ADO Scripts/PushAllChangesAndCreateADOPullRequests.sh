@@ -168,11 +168,6 @@ ADOOrganization=$(promptUserForValueIfEmpty "$3" "Please enter the Organization 
 echo -e "the source branch name is:$LightYellow $sourceBranchName $NoColor"
 echo -e "the commit message is:$LightYellow $commitMessage $NoColor"
 
-#what the default branchName
-defaultBranchName=$(getDefaultBranchName)
-
-echo "the default branch name is $defaultBranchName"
-
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
 eval cd \"$gitRoot\" || { exit; };
 for currDirectory in */ ; do 
