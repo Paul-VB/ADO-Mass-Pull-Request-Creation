@@ -101,13 +101,14 @@ function createBranchAndPushToRemote(){
     local uniqueBranchName=$(getSimilarButUnusedNewBranchName $sourceBranchName)
 
     #next, lets create the new branch. If any errors happen, dont go any further
-    eval "git checkout -b '$uniqueBranchName'"
+    eval "git checkout -b $uniqueBranchName"
     if [ $? -ne 0 ]; then
         echo "ERROR: for git repo $repo, $uniqueBranchName is not a valid branch name" 1>&2
         return 1        
     fi
     #if that went well, continue
-    eval "git commit -a -m '${commitMessage}'"
+    eval "git add -a"
+    eval "git commit -m '${commitMessage}'"
     eval "git push origin $uniqueBranchName"
     return 0
 }
