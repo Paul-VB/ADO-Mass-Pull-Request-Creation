@@ -66,7 +66,7 @@ function getDefaultBranchName(){
 touch "$tempDir/ReposWithChangesTmpFile"
 #this function checks a directory, and if it's a git repo with unmerged changes, add that directory to gitRepoHasUnmergedChanges
 function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
-    local currDirectory=${1::-1}
+    local currDirectory=${1}
     eval cd \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
 	if [ -d .git ]; then
         #we know we're in a git repo. Does the git repo have unmerged changes?
@@ -82,8 +82,33 @@ function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
 	cd ..; 
 }
 
-function createBranchAndPullRequest(){
-	local currDirectory=${1::-1}
+#this function takes a directory that is known to be a git repo with unmerged changes.
+#It create a new branch, adds all changes to the new branch, creates a remote branch and pushes to it,
+function createBranchAndPushToRemote(){
+	local currDirectory=${1}
+    eval cd \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
+    getSimilarButUnusedNewBranchName $sourceBranchName $repo
+    #first, lets check if there already exists 
+    #in the current git repo, try to make a new branch with the name of the source branch
+    # eval "git checkout -b '$sourceBranchName'"
+    # if [ $? -neq 0 ]; then
+    #     echo FAIL
+    # fi
+    cd ..; 
+
+}
+
+#In the current git repo we're in, check if the supplied branch name already exists remotley.
+#If it does exist, then return a similar name that is unused.
+#if it does not exist, then return the branch name as-is
+function getSimilarButUnusedNewBranchName(){
+    local branchName=${1}
+    local repo=${2}
+    echo "For Repo $repo, Checking if there are any existsing remote branch names by the name $branchName"
+    #declare -a similarBranches=($(git ls-remote | grep $branchName))
+    declare -a similarBranches=($(git ls-remote --exit-code --heads origin $branchName))
+    declare similarBranchesCount=${#similarBranches[*]}
+    echo "repo $repo has: $similarBranchesCount remote branches with a similar name to $branchName"
 }
 
 #this is the source branch name that all our commits will use
@@ -105,24 +130,24 @@ echo "the default branch name is $defaultBranchName"
 eval cd \"$gitRoot\" || { exit; };
 for currDirectory in */ ; do 
     #haha parallelization go brr
+    currDirectory=${currDirectory::-1} #this strips off the trailing /
     checkIfDirectoryIsGitRepoWithUnmergedChanges $currDirectory &
 done 
 wait
 mapfile -t ReposWithChanges < "$tempDir/ReposWithChangesTmpFile"
-for repo in "${ReposWithChanges[@]}" ; do 
-	echo "$repo"
-done 
 echo -e "\nChecked all repos";
 rm "$tempDir/ReposWithChangesTmpFile"
 
 declare ReposWithChangesCount=${#ReposWithChanges[*]}
 
 echo "ReposWithChangesCount is $ReposWithChangesCount"
-
 if [[ "$ReposWithChangesCount" -eq "0" ]]; then
     echo -e "All repos are clean!";
 else
-    echo -e "some repos are dirty";
+    for repo in "${ReposWithChanges[@]}" ; do 
+        createBranchAndPushToRemote $repo &
+    done 
+    wait
 fi
 
 
