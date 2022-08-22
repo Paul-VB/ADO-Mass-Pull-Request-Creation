@@ -107,9 +107,10 @@ function createBranchAndPushToRemote(){
         return 1        
     fi
     #if that went well, continue
-    eval "git add -A"
-    eval "git commit -m '${commitMessage}'"
-    eval "git push origin $uniqueBranchName"
+    eval "git add -A";
+    echo -e $Blue"Trying to add ${commitMessage} to commit message for repo $repo"$NoColor
+    eval "git commit -m '${commitMessage}'";
+    eval "git push origin $uniqueBranchName";
     return 0
 }
 
