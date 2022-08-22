@@ -100,7 +100,7 @@ function createBranchAndPushToRemote(){
     #first, lets get a branch name that is not already in use
     local uniqueBranchName=$(getSimilarButUnusedNewBranchName $sourceBranchName)
 
-    echo "For repo $repo, a unique branch name of $uniqueBranchName is avalible";
+    #echo "For repo $repo, a unique branch name of $uniqueBranchName is avalible";
     return 1
     #next, lets create the new branch. If any errors happen, dont go any further
     # eval "git checkout -b '$uniqueBranchName'"
@@ -149,7 +149,7 @@ function branchAndCreatePR(){
     if [ $? -eq 0 ]; then #Only make the PR if the branching process did not error
         createADOPullRequest
     else
-        echo "Skipping PR creation for repo $repo" 
+        echo -e $LightRed"Skipping PR creation for repo $repo"$NoColor; 
     fi
     
     cd ..; 
@@ -165,8 +165,8 @@ commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message
 #this will become part of the pull request creation URL.
 ADOOrganization=$(promptUserForValueIfEmpty "$3" "Please enter the Organization part of the Azure Devops URL: ")
 
-echo "the source branch name is: $sourceBranchName"
-echo "the commit message is: $commitMessage"
+echo -e "the source branch name is:$LightYellow $sourceBranchName $NoColor"
+echo -e "the commit message is:$LightYellow $commitMessage $NoColor"
 
 #what the default branchName
 defaultBranchName=$(getDefaultBranchName)
