@@ -125,7 +125,7 @@ function getSimilarButUnusedNewBranchName (){
     if [[ ${#similarBranches[*]} -eq "0" ]]; then
         echo $branchName;
     else
-        echo getSimilarButUnusedNewBranchName "${branchName}.1"
+        echo $(getSimilarButUnusedNewBranchName "${branchName}.1")
     fi
 }
 
