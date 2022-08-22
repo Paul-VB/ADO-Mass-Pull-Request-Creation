@@ -102,7 +102,7 @@ function createBranchAndPushToRemote(){
 
     #next, lets create the new branch. If any errors happen, dont go any further
     eval "git checkout -b '$uniqueBranchName'"
-    if [ $? -neq 0 ]; then
+    if [ $? -eq 0 ]; then
         echo "ERROR: for git repo $repo, $uniqueBranchName is not a valid branch name" 1>&2
         return 1        
     fi
