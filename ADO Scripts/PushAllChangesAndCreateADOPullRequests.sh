@@ -92,34 +92,51 @@ function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
 #this function takes a directory that is known to be a git repo with unmerged changes.
 #It create a new branch, adds all changes to the new branch, creates a remote branch and pushes to it,
 function createBranchAndPushToRemote(){
-	local currDirectory=${1}
-    eval cd \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
-    getSimilarButUnusedNewBranchName $sourceBranchName $repo
-    #first, lets check if there already exists 
-    #in the current git repo, try to make a new branch with the name of the source branch
-    # eval "git checkout -b '$sourceBranchName'"
-    # if [ $? -neq 0 ]; then
-    #     echo FAIL
-    # fi
-    cd ..; 
+	local repo=${1}
+    eval cd \"$repo\" || { true; };
 
+    #first, lets get a branch name that is not already in use
+    local uniqueBranchName=$(getSimilarButUnusedNewBranchName $sourceBranchName)
+
+    echo "For repo $repo, a unique branch name of $uniqueBranchName is avalible";
+
+    # #next, lets create the new branch. If any errors happen, dont go any further
+    # eval "git checkout -b '$uniqueBranchName'"
+    # if [ $? -neq 0 ]; then
+    #     echo "ERROR: for git repo $repo, $uniqueBranchName is not a valid branch name" 1>&2
+    #     return 1        
+    # fi
+    # #if that went well, continue
+    # eval "git commit -a -m '${commitMessage}'"
+    # eval "git push origin $uniqueBranchName"
+    # #first, lets check if there already exists 
+    # #in the current git repo, try to make a new branch with the name of the source branch
+    # # eval "git checkout -b '$sourceBranchName'"
+    # # if [ $? -neq 0 ]; then
+    # #     echo FAIL
+    # # fi
+    cd ..; 
 }
 
 #In the current git repo we're in, check if the supplied branch name already exists remotley.
 #If it does exist, then return a similar name that is unused.
 #if it does not exist, then return the branch name as-is
-function getSimilarButUnusedNewBranchName(){
+function getSimilarButUnusedNewBranchName (){
     local branchName=${1}
-    local repo=${2}
-    echo "For Repo $repo, Checking if there are any existsing remote branch names by the name $branchName"
-    #declare -a similarBranches=($(git ls-remote | grep $branchName))
-    #declare -a similarBranches=($(git ls-remote --exit-code --heads origin $branchName))
+    # declare -a similarBranches=($(git ls-remote | grep $branchName))
+    # declare -a similarBranches=($(git ls-remote --exit-code --heads origin $branchName))
     declare -a similarBranches=($(git branch -r | grep $branchName))
     declare similarBranchesCount=${#similarBranches[*]}
-    echo "repo $repo has $similarBranchesCount similar branches"
-    for branches in ${similarBranches[@]}; do
-        echo "repo $repo has a similar branch name: $branches"
-    done
+
+    if [[ ${#similarBranches[*]} -eq "0" ]]; then
+        echo $branchName;
+    else
+        echo getSimilarButUnusedNewBranchName "${branchName}.1"
+    fi
+}
+
+#in the current git repo
+function createADOPullRequest(){
 
 }
 
