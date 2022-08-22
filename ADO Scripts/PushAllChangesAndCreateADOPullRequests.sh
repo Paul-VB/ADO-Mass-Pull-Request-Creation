@@ -101,8 +101,8 @@ function createBranchAndPushToRemote(){
     local uniqueBranchName=$(getSimilarButUnusedNewBranchName $sourceBranchName)
 
     echo "For repo $repo, a unique branch name of $uniqueBranchName is avalible";
-
-    # #next, lets create the new branch. If any errors happen, dont go any further
+    return 1
+    #next, lets create the new branch. If any errors happen, dont go any further
     # eval "git checkout -b '$uniqueBranchName'"
     # if [ $? -neq 0 ]; then
     #     echo "ERROR: for git repo $repo, $uniqueBranchName is not a valid branch name" 1>&2
@@ -111,12 +111,6 @@ function createBranchAndPushToRemote(){
     # #if that went well, continue
     # eval "git commit -a -m '${commitMessage}'"
     # eval "git push origin $uniqueBranchName"
-    # #first, lets check if there already exists 
-    # #in the current git repo, try to make a new branch with the name of the source branch
-    # # eval "git checkout -b '$sourceBranchName'"
-    # # if [ $? -neq 0 ]; then
-    # #     echo FAIL
-    # # fi
 }
 
 #In the current git repo we're in, check if the supplied branch name already exists remotley.
@@ -152,7 +146,12 @@ function branchAndCreatePR(){
 	local repo=${1}
     eval cd \"$repo\" || { true; };
     createBranchAndPushToRemote
-    createADOPullRequest
+    if [ $? -eq 0 ]; then #Only make the PR if the branching process did not error
+        createADOPullRequest
+    else
+        echo "Skipping PR creation for repo $repo" 
+    fi
+    
     cd ..; 
 }
 
