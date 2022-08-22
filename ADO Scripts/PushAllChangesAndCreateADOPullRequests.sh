@@ -63,21 +63,6 @@ function getDefaultBranchName(){
     echo "$(eval "git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'")"
 }
 
-#this is the source branch name that all our commits will use
-sourceBranchName=$(promptUserForValueIfEmpty "$1" "Please Enter your source branch name: ")
-sourceBranchName=$(createValidGitBranchName "$sourceBranchName")
-
-#this will be what we use as the commit message for all our git commits
-commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message: ")
-
-echo "the source branch name is: $sourceBranchName"
-echo "the commit message is: $commitMessage"
-
-#what the default branchName
-defaultBranchName=$(getDefaultBranchName)
-
-echo "the default branch name is $defaultBranchName"
-
 touch "$tempDir/ReposWithChangesTmpFile"
 #this function checks a directory, and if it's a git repo with unmerged changes, add that directory to gitRepoHasUnmergedChanges
 function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
@@ -100,6 +85,21 @@ function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
 function createBranchAndPullRequest(){
 	local currDirectory=${1::-1}
 }
+
+#this is the source branch name that all our commits will use
+sourceBranchName=$(promptUserForValueIfEmpty "$1" "Please Enter your source branch name: ")
+sourceBranchName=$(createValidGitBranchName "$sourceBranchName")
+
+#this will be what we use as the commit message for all our git commits
+commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message: ")
+
+echo "the source branch name is: $sourceBranchName"
+echo "the commit message is: $commitMessage"
+
+#what the default branchName
+defaultBranchName=$(getDefaultBranchName)
+
+echo "the default branch name is $defaultBranchName"
 
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
 eval cd \"$gitRoot\" || { exit; };
