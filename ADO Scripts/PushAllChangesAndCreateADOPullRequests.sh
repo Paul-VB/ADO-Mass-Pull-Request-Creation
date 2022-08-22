@@ -138,9 +138,9 @@ function getSimilarButUnusedNewBranchName (){
 
 #in the current git repo, create a pull request to merge the current branch with the default branch
 function createADOPullRequest(){
-    local repo = basename $(pwd)
-    currentBranchName=getCurrentBranchName
-    targetBranchName=getDefaultBranchName
+    local repo=($(basename $(pwd)))
+    currentBranchName=$(getCurrentBranchName)
+    targetBranchName=$(getDefaultBranchName)
     url=`git config --get remote.origin.url`
     newPrUrl="https://dev.azure.com/${ADOOrganization}/_git/${repo}/pullrequestcreate?sourceRef=${currentBranchName}&targetRef=${targetBranchName}"
     echo $newPrUrl >> "$scriptPath/$PrListFilePath"
