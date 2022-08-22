@@ -70,6 +70,11 @@ function getDefaultBranchName(){
     echo "$(eval "git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'")"
 }
 
+#get the current branch name of the current repository
+function getCurrentBranchName(){
+    echo "$(eval "git symbolic-ref HEAD | sed 's@^refs/heads/@@'")"
+}
+
 touch "$tempDir/ReposWithChangesTmpFile"
 #this function checks a directory, and if it's a git repo with unmerged changes, add that directory to gitRepoHasUnmergedChanges
 function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
@@ -92,9 +97,6 @@ function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
 #this function takes a directory that is known to be a git repo with unmerged changes.
 #It create a new branch, adds all changes to the new branch, creates a remote branch and pushes to it,
 function createBranchAndPushToRemote(){
-	local repo=${1}
-    eval cd \"$repo\" || { true; };
-
     #first, lets get a branch name that is not already in use
     local uniqueBranchName=$(getSimilarButUnusedNewBranchName $sourceBranchName)
 
@@ -115,7 +117,6 @@ function createBranchAndPushToRemote(){
     # # if [ $? -neq 0 ]; then
     # #     echo FAIL
     # # fi
-    cd ..; 
 }
 
 #In the current git repo we're in, check if the supplied branch name already exists remotley.
@@ -135,10 +136,25 @@ function getSimilarButUnusedNewBranchName (){
     fi
 }
 
-#in the current git repo
-# function createADOPullRequest(){
+#in the current git repo, create a pull request to merge the current branch with the default branch
+function createADOPullRequest(){
+    local repo = basename $(pwd)
+    currentBranchName=getCurrentBranchName
+    targetBranchName=getDefaultBranchName
+    url=`git config --get remote.origin.url`
+    newPrUrl="https://dev.azure.com/${ADOOrganization}/_git/${repo}/pullrequestcreate?sourceRef=${currentBranchName}&targetRef=${targetBranchName}"
+    echo $newPrUrl >> "$scriptPath/$PrListFilePath"
+    eval "start $newPrUrl"
+}
 
-# }
+#CD into a repo, create a branch and push it to the origin, and create an ADO pull request for it
+function branchAndCreatePR(){
+	local repo=${1}
+    eval cd \"$repo\" || { true; };
+    createBranchAndPushToRemote
+    #createADOPullRequest
+    cd ..; 
+}
 
 #this is the source branch name that all our commits will use
 sourceBranchName=$(promptUserForValueIfEmpty "$1" "Please Enter your source branch name: ")
@@ -146,6 +162,9 @@ sourceBranchName=$(createValidGitBranchName "$sourceBranchName")
 
 #this will be what we use as the commit message for all our git commits
 commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message: ")
+
+#this will become part of the pull request creation URL.
+ADOOrganization=$(promptUserForValueIfEmpty "$3" "Please enter the Organization part of the Azure Devops URL: ")
 
 echo "the source branch name is: $sourceBranchName"
 echo "the commit message is: $commitMessage"
@@ -174,20 +193,10 @@ if [[ "$ReposWithChangesCount" -eq "0" ]]; then
     echo -e "All repos are clean!";
 else
     for repo in "${ReposWithChanges[@]}" ; do 
-        createBranchAndPushToRemote $repo &
+        branchAndCreatePR $repo &
     done 
     wait
 fi
 
-
-#in the current git repo, try to make a new branch with the name of the source branch
-# eval "git checkout -b '$sourceBranchName'"
-# if [ $? -eq 0 ]; then
-#     echo OK
-# else
-#     echo FAIL
-# fi
-
 #waits for the user to press the any key
 read -r -p "Press the any key to continue " input
-
