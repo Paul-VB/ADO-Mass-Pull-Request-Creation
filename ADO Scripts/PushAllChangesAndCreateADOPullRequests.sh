@@ -65,6 +65,7 @@ function promptUserForYesOrNo(){
         case $input in
         [yY][eE][sS]|[yY])
             echo "True"
+        break
         ;;
         [nN][oO]|[nN])
             echo "False"
@@ -153,7 +154,15 @@ function getSimilarButUnusedNewBranchName (){
     if [[ ${#similarBranches[*]} -eq "0" ]]; then
         echo $branchName
     else
-        echo $(getSimilarButUnusedNewBranchName "${branchName}.1");
+        #we know we'll have to append a .number after the branch name
+        existingTrailingNumber=$(grep -oh --regexp=\\.[0-9][0-9]*$ <<< $branchName) #this regex grabs a period and any numbers at the end of a string, if there are any
+        stuffThatComesBeforeTheTrailingNumbers=$(grep -Poh --regexp=^..*\(?=\\.[0-9][0-9]*$\) <<< $branchName)
+        if [[ -z $existingTrailingNumber ]]; then
+            echo $(getSimilarButUnusedNewBranchName "${branchName}.1");
+        else
+            nextNumber=$((${existingTrailingNumber:1}+1)) #adds 1 to the end thing
+            echo $(getSimilarButUnusedNewBranchName "${stuffThatComesBeforeTheTrailingNumbers}.${nextNumber}");
+        fi
     fi
 }
 
