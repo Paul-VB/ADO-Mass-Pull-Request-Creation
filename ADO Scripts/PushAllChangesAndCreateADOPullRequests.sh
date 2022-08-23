@@ -186,10 +186,11 @@ rm "$tempDir/ReposWithChangesTmpFile"
 
 declare ReposWithChangesCount=${#ReposWithChanges[*]}
 
-echo "ReposWithChangesCount is $ReposWithChangesCount"
+echo "Number of Repos with changes: $ReposWithChangesCount"
 if [[ "$ReposWithChangesCount" -eq "0" ]]; then
     echo -e "All repos are clean!";
 else
+    echo "Get ready for git spam..."
     for repo in "${ReposWithChanges[@]}" ; do 
         branchAndCreatePR $repo &
     done 
