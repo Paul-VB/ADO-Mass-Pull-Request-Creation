@@ -55,6 +55,33 @@ function promptUserForValueIfEmpty(){
     fi 
 }
 
+#asks the user a yes or no question
+function promptUserForYesOrNo(){
+    local prompt
+    prompt="$1"
+    while true
+        do
+        read -r -p "$prompt [Y/n]" input
+        case $input in
+        [yY][eE][sS]|[yY])
+            echo "True"
+        ;;
+        [nN][oO]|[nN])
+            echo "False"
+        break
+        ;;
+        *)
+            echo "Invalid input..." >&2
+        ;;
+        esac
+    done
+}
+
+#waits for the user to press the any key
+function pressAnyKeyToContinue(){
+    read -r -p "Press the any key to continue " input
+}
+
 #given a string, return that string such that it could be used as a valid git branch name
 #with invalid characters stripped out or replaced
 function createValidGitBranchName(){
@@ -166,11 +193,19 @@ commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message
 #this will become part of the pull request creation URL.
 ADOOrganization=$(promptUserForValueIfEmpty "$3" "Please enter the Organization part of the Azure Devops URL: ")
 
-#this will
-declare PrListFilePath="PR List For ${commitMessage}_${currDate}.txt"
-
 echo -e "the source branch name is:$LightYellow $sourceBranchName $NoColor"
 echo -e "the commit message is:$LightYellow $commitMessage $NoColor"
+
+#ask the user to confirm if they want to continue
+shouldContinue=$(promptUserForYesOrNo "Do the source branch and commit messages look correct? (Y/N)" )
+if [[ "$shouldContinue" == "False" ]]; then
+    echo "Aborting..."
+    pressAnyKeyToContinue
+    exit 1
+fi
+
+#this will be where the list of pull request links will be placed.
+declare PrListFilePath="PR List For ${commitMessage}_${currDate}.txt"
 
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
 eval cd \"$gitRoot\" || { exit; };
@@ -198,4 +233,4 @@ else
 fi
 
 #waits for the user to press the any key
-read -r -p "Press the any key to continue " input
+pressAnyKeyToContinue
