@@ -129,7 +129,7 @@ function getSimilarButUnusedNewBranchName (){
         echo $(getSimilarButUnusedNewBranchName "${branchName}.1");
     fi
 }
-declare PrListFilePath="PR List For ${commitMessage}.txt"
+declare PrListFilePath="PR List For $commitMessage.txt"
 #in the current git repo, create a pull request to merge the current branch with the default branch
 function createADOPullRequest(){
     local repo=($(basename $(pwd)))
