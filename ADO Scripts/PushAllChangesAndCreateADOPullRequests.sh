@@ -162,7 +162,6 @@ function createADOPullRequest(){
     local repo=($(basename $(pwd)))
     currentBranchName=$(getCurrentBranchName)
     targetBranchName=$(getDefaultBranchName)
-    url=`git config --get remote.origin.url`
     newPrUrl="https://dev.azure.com/${ADOOrganization}/_git/${repo}/pullrequestcreate?sourceRef=${currentBranchName}&targetRef=${targetBranchName}"
     echo $newPrUrl >> "$scriptPath/$PrListFilePath"
     eval "start $newPrUrl"
