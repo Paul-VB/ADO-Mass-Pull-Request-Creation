@@ -29,7 +29,7 @@ NoColor="\033[0m";
 
 
 declare scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
-declare currDate=`date +"%Y-%m-%d_%H-%M-%S"`;
+declare currDate="$(date +"%Y-%m-%d_%H-%M-%S")";
 gitRoot="C:\git";
 
 #for the sake of clarity, i'll make a globalish var here to point to where we're gonna store our temporary files
@@ -98,7 +98,8 @@ function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
 #It create a new branch, adds all changes to the new branch, creates a remote branch and pushes to it,
 function createBranchAndPushToRemote(){
     #first, lets get a branch name that is not already in use
-    local uniqueBranchName=$(getSimilarButUnusedNewBranchName $sourceBranchName)
+    local uniqueBranchName
+    uniqueBranchName=$(getSimilarButUnusedNewBranchName $sourceBranchName)
 
     #next, lets create the new branch. If any errors happen, dont go any further
     eval "git checkout -b $uniqueBranchName"
@@ -121,15 +122,14 @@ function getSimilarButUnusedNewBranchName (){
     # declare -a similarBranches=($(git ls-remote | grep $branchName))
     # declare -a similarBranches=($(git ls-remote --exit-code --heads origin $branchName))
     declare -a similarBranches=($(git branch -a | grep $branchName))
-    declare similarBranchesCount=${#similarBranches[*]}
 
     if [[ ${#similarBranches[*]} -eq "0" ]]; then
-        echo $branchName;
+        echo $branchName
     else
         echo $(getSimilarButUnusedNewBranchName "${branchName}.1");
     fi
 }
-
+declare PrListFilePath="PR List For ${commitMessage}.txt"
 #in the current git repo, create a pull request to merge the current branch with the default branch
 function createADOPullRequest(){
     local repo=($(basename $(pwd)))
@@ -155,6 +155,7 @@ function branchAndCreatePR(){
     cd ..; 
 }
 
+#where "main" starts
 #this is the source branch name that all our commits will use
 sourceBranchName=$(promptUserForValueIfEmpty "$1" "Please Enter your source branch name: ")
 sourceBranchName=$(createValidGitBranchName "$sourceBranchName")
