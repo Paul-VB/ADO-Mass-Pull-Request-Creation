@@ -129,7 +129,7 @@ function getSimilarButUnusedNewBranchName (){
         echo $(getSimilarButUnusedNewBranchName "${branchName}.1");
     fi
 }
-declare PrListFilePath="PR List For $commitMessage.txt"
+
 #in the current git repo, create a pull request to merge the current branch with the default branch
 function createADOPullRequest(){
     local repo=($(basename $(pwd)))
@@ -165,6 +165,9 @@ commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message
 
 #this will become part of the pull request creation URL.
 ADOOrganization=$(promptUserForValueIfEmpty "$3" "Please enter the Organization part of the Azure Devops URL: ")
+
+#this will
+declare PrListFilePath="PR List For ${commitMessage}_${currDate}.txt"
 
 echo -e "the source branch name is:$LightYellow $sourceBranchName $NoColor"
 echo -e "the commit message is:$LightYellow $commitMessage $NoColor"
