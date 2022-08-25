@@ -1,8 +1,11 @@
 #!/bin/bash
 
-#first, read the list of nugetPackages that need updating
-readarray -t nugetPackagesAndVersions < "./NuGetPackages.txt"
-
+#the contents of the nugetPackageVersion file should be such that each line is: the nugetPackge name, a comma(,), the new version number
+#for example:
+#someRandomNugetPackage,1.2.3
+#someOtherNugetPackage,69
+#someThirdPackage,420.1
+nugetPackageVersionsFile="./NuGetPackages.txt"
 gitRoot="C:\git";
 
 #this function finds all the vbproj and csproj files in the current directory
@@ -90,5 +93,7 @@ function updateAllRepos(){
     wait
 }
 echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
+#first, read the list of nugetPackages that need updating
+readarray -t nugetPackagesAndVersions < "$nugetPackageVersionsFile"
 updateAllRepos
 echo "finished"
