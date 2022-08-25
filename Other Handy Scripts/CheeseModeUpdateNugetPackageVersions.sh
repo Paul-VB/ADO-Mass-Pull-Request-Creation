@@ -97,3 +97,5 @@ echo "replacing old version numbers with new version numbers. this might take a 
 readarray -t nugetPackagesAndVersions < "$nugetPackageVersionsFile"
 updateAllRepos
 echo "finished"
+date -ud "@$SECONDS" "+Time elapsed: %H:%M:%S" #i dont know why this works, but it works
+read -r -p "Press the any key to continue " input
