@@ -1,17 +1,9 @@
 #!/bin/bash
 
 #first, read the list of nugetPackages that need updating
-readarray -t nugetPackages < "./NuGetPackages.txt"
-
+readarray -t nugetPackagesAndVersions < "./NuGetPackages.txt"
 
 gitRoot="C:\git";
-
-tempDir="/tmp"
-
-newPackageVersion="3.0.170"
-
-
-echo "replacing old version numbers with new version numbers. this might take a minute..."
 
 #this function finds all the vbproj and csproj files in the current directory
 function findAllProjFiles(){
@@ -34,7 +26,6 @@ function findAndReplaceInFile(){
     thingToChangeItTo="${3}"
     perl -w -i -p -00e "s/${thingToMatch}/${thingToChangeItTo}/gs" "$filePath"
 }
-
 
 #for a given projfile, update the given nugetpackage to the given newVersion
 function updateProjfileNuGetPackageVersion(){
@@ -62,6 +53,7 @@ function updateProjfileNuGetPackageVersion(){
 
 }
 
+#in the current repo, update all the projFiles to have newer nugetPackage versions
 function updateCurrentRepo(){
     #we know we're in a git repo.
     #local -a projFiles
@@ -70,15 +62,21 @@ function updateCurrentRepo(){
     # mapfile -t projFiles < "$(findAllProjFiles)"
     for currProjFile in "${projFiles[@]}"; do
         if [[ -f $currProjFile ]]; then
-            for currNugetPackage in "${nugetPackages[@]}" ; do
-                currNugetPackage=$(echo "${currNugetPackage}" | sed -E 's/\r//g')
-                updateProjfileNuGetPackageVersion "${currProjFile}" "${currNugetPackage}" "${newPackageVersion}"
-            done
-            echo "$currProjFile has been updated"
+            for currNugetPackageAndVersion in "${nugetPackagesAndVersions[@]}" ; do
+            currNugetPackageAndVersion=$(echo "${currNugetPackageAndVersion}" | sed -E 's/\r//g')
+            IFS=',';
+            currNugetPackageAndVersion=(${currNugetPackageAndVersion})
+            unset IFS;
+            currNugetPackage=${currNugetPackageAndVersion[0]}
+            newPackageVersion=${currNugetPackageAndVersion[1]}
+            updateProjfileNuGetPackageVersion "${currProjFile}" "${currNugetPackage}" "${newPackageVersion}"
+        done
+        echo "$currProjFile has been updated"
         fi
     done
 }
 
+#this function loops through all the folders in the current directory. If that folder is a git repo, then begin updating it's nugetPackage versions
 function updateAllRepos(){
     eval cd \"$gitRoot\" || { true; };
     for currDirectory in */ ; do 
@@ -91,8 +89,6 @@ function updateAllRepos(){
     done 
     wait
 }
-
+echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
 updateAllRepos
 echo "finished"
-
-
