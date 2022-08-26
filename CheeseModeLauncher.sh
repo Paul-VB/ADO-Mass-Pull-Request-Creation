@@ -1,12 +1,10 @@
 #!/bin/bash
 
-configFilePath="./config.cfg"
-if [[ -f ${configFilePath} ]]; then
-    echo "the config file exists"
-    source ${configFilePath} 
+nugetPackageVersionsFilePath="./NuGetPackages.txt"
 
+#check if the nugetPackageVersionsFile exists
+if [[ -f ${nugetPackageVersionsFilePath} ]]; then
+    sh 'Core-Scripts/CheeseModeUpdateNugetPackageVersions.sh' "$(<${nugetPackageVersionsFilePath})"
 else
-    echo "it does not exist"
+    echo "${nugetPackageVersionsFilePath} does not exist."
 fi
-
-echo "egg: $egg"

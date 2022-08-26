@@ -1,10 +1,12 @@
 #!/bin/bash
+declare scriptPath
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 
-#init the coreConfig variables
-source coreConfig.cfg
+#init the config variables
+source "$scriptPath/../config.cfg"
 
 #init the pretty colors
-source prettyColors.sh
+source "$scriptPath/prettyColors.sh"
 
 #sets the title of the terminal window
 function setTerminalTitle(){

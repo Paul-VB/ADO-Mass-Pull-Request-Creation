@@ -1,12 +1,12 @@
 #!/bin/bash
+declare scriptPath
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 
-#the contents of the nugetPackageVersion file should be such that each line is: the nugetPackge name, a comma(,), the new version number
-#for example:
-#someRandomNugetPackage,1.2.3
-#someOtherNugetPackage,69
-#someThirdPackage,420.1
-nugetPackageVersionsFile="./NuGetPackages.txt"
-gitRoot="C:\git";
+#init the config variables
+source "$scriptPath/../config.cfg"
+
+#init the pretty colors
+source "$scriptPath/prettyColors.sh"
 
 #this function finds all the vbproj and csproj files in the current directory
 function findAllProjFiles(){
@@ -92,10 +92,51 @@ function updateAllRepos(){
     done 
     wait
 }
+
+#this function takes as input key/value pairs from a string and populates a supplied dictionary in-place.
+#The KVPs are separated by newlines, and the keys are delimited from the values by commas. and returns a dictionary
+#the main use of this function is basicallyy to cat in a file contents and spit out a dictionary
+#the contents of the file should look something like this:
+#key1,value1
+#key2,value2
+function populateDictFromNewlineSeparatedStrings(){
+    #this is an array of KVPs, but the Keys and values are smushed together. we need to separate them
+    local smushedKVPs
+    readarray -t smushedKVPs <<< "${1}";
+
+    #this is the dictionary we will populate in-place
+    declare -n dictionaryToUpdate="${2}";
+
+    for KVPString in "${smushedKVPs[@]}"; do
+        KVPString=$(echo "${KVPString}" | sed -E 's/\r//g') #this strips off pesky carriage returns
+        IFS=','; #this sets the delimiter to a comma
+        local separatedKVP=(${KVPString})
+        unset IFS;
+        local key=${separatedKVP[0]}
+        local value=${separatedKVP[1]}
+        dictionaryToUpdate[$key]=$value
+    done
+}
+
+#the "main" area
+
+#parse the input recieved from the launcher. This input is literally just the contents of the whole NuGetPackages.txt file
+#the contents of the nugetPackageVersion file should be such that each line is: the nugetPackge name, a comma(,), the new version number
+#for example:
+#someRandomNugetPackage,1.2.3
+#someOtherNugetPackage,69
+#someThirdPackage,420.1
+declare -A nuGetPackageVersionsDict
+populateDictFromNewlineSeparatedStrings "${1}" nuGetPackageVersionsDict
+
+for key in "${!nuGetPackageVersionsDict[@]}"; do
+    echo "key is $key"
+done
+
 echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
-#first, read the list of nugetPackages that need updating
-readarray -t nugetPackagesAndVersions < "$nugetPackageVersionsFile"
-updateAllRepos
+
+#updateAllRepos
 echo "finished"
+echo "gitroot is $gitRoot"
 date -ud "@$SECONDS" "+Time elapsed: %H:%M:%S" #i dont know why this works, but it works
 read -r -p "Press the any key to continue " input
