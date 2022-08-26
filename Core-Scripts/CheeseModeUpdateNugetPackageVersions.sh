@@ -2,12 +2,15 @@
 declare scriptPath
 scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 
-# #init the config variables
-# source "$scriptPath/../config.cfg"
-sh "$scriptPath/readConfig.sh" || { exit; };
-
 #init the pretty colors
 source "$scriptPath/prettyColors.sh"
+
+#press the any key
+source "$scriptPath/pressAnyKeyToContinue.sh"
+
+# #init the config variables
+# source "$scriptPath/../config.cfg"
+sh "$scriptPath/readConfig.sh" || pressAnyKeyToContinue && { exit; };
 
 #this function finds all the vbproj and csproj files in the current directory
 function findAllProjFiles(){

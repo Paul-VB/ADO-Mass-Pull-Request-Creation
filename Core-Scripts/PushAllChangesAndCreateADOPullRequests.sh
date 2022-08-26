@@ -2,12 +2,15 @@
 declare scriptPath
 scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 
-# #init the config variables
-# source "$scriptPath/../config.cfg"
-sh "$scriptPath/readConfig.sh" || { exit; };
-
 #init the pretty colors
 source "$scriptPath/prettyColors.sh"
+
+#press the any key
+source "$scriptPath/pressAnyKeyToContinue.sh"
+
+# #init the config variables
+# source "$scriptPath/../config.cfg"
+sh "$scriptPath/readConfig.sh" || pressAnyKeyToContinue && { exit; };
 
 #sets the title of the terminal window
 function setTerminalTitle(){
@@ -50,10 +53,7 @@ function promptUserForYesOrNo(){
     done
 }
 
-#waits for the user to press the any key
-function pressAnyKeyToContinue(){
-    read -r -p "Press the any key to continue " input
-}
+
 
 #given a string, return that string such that it could be used as a valid git branch name
 #with invalid characters stripped out or replaced
