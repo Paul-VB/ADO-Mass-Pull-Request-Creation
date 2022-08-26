@@ -66,14 +66,14 @@ function updateCurrentRepo(){
     for currProjFile in "${projFiles[@]}"; do
         if [[ -f $currProjFile ]]; then
             for currNugetPackageAndVersion in "${nugetPackagesAndVersions[@]}" ; do
-            currNugetPackageAndVersion=$(echo "${currNugetPackageAndVersion}" | sed -E 's/\r//g')
-            IFS=',';
-            currNugetPackageAndVersion=(${currNugetPackageAndVersion})
-            unset IFS;
-            currNugetPackage=${currNugetPackageAndVersion[0]}
-            newPackageVersion=${currNugetPackageAndVersion[1]}
-            updateProjfileNuGetPackageVersion "${currProjFile}" "${currNugetPackage}" "${newPackageVersion}"
-        done
+                currNugetPackageAndVersion=$(echo "${currNugetPackageAndVersion}" | sed -E 's/\r//g')
+                IFS=',';
+                currNugetPackageAndVersion=(${currNugetPackageAndVersion})
+                unset IFS;
+                currNugetPackage=${currNugetPackageAndVersion[0]}
+                newPackageVersion=${currNugetPackageAndVersion[1]}
+                updateProjfileNuGetPackageVersion "${currProjFile}" "${currNugetPackage}" "${newPackageVersion}"
+            done
         echo "$currProjFile has been updated"
         fi
     done
