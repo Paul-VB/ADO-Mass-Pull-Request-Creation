@@ -10,7 +10,7 @@ source "$scriptPath/pressAnyKeyToContinue.sh"
 
 # #init the config variables
 # source "$scriptPath/../config.cfg"
-sh "$scriptPath/readConfig.sh" || pressAnyKeyToContinue && { exit; };
+source "$scriptPath/readConfig.sh" || { pressAnyKeyToContinue && { exit; }; }
 
 #this function finds all the vbproj and csproj files in the current directory
 function findAllProjFiles(){
@@ -69,13 +69,10 @@ function updateCurrentRepo(){
     # mapfile -t projFiles < "$(findAllProjFiles)"
     for currProjFile in "${projFiles[@]}"; do
         if [[ -f $currProjFile ]]; then
-            for currNugetPackageAndVersion in "${nugetPackagesAndVersions[@]}" ; do
-                currNugetPackageAndVersion=$(echo "${currNugetPackageAndVersion}" | sed -E 's/\r//g')
-                IFS=',';
-                currNugetPackageAndVersion=(${currNugetPackageAndVersion})
-                unset IFS;
-                currNugetPackage=${currNugetPackageAndVersion[0]}
-                newPackageVersion=${currNugetPackageAndVersion[1]}
+
+            for key in "${!nuGetPackageVersionsDict[@]}"; do
+                currNugetPackage=${key}
+                newPackageVersion=${nuGetPackageVersionsDict[$key]}
                 updateProjfileNuGetPackageVersion "${currProjFile}" "${currNugetPackage}" "${newPackageVersion}"
             done
         echo "$currProjFile has been updated"
@@ -133,14 +130,11 @@ function populateDictFromNewlineSeparatedStrings(){
 declare -A nuGetPackageVersionsDict
 populateDictFromNewlineSeparatedStrings "${1}" nuGetPackageVersionsDict
 
-for key in "${!nuGetPackageVersionsDict[@]}"; do
-    echo "key is $key"
-done
-
 echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
 
-#updateAllRepos
+updateAllRepos
 echo "finished"
-echo "gitroot is $gitRoot"
 date -ud "@$SECONDS" "+Time elapsed: %H:%M:%S" #i dont know why this works, but it works
-read -r -p "Press the any key to continue " input
+
+#waits for the user to press the any key
+pressAnyKeyToContinue
