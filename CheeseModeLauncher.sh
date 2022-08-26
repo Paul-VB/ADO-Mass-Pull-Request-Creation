@@ -7,8 +7,6 @@ source "$scriptPath/Core-Scripts/pressAnyKeyToContinue.sh"
 
 nugetPackageVersionsFilePath="./NuGetPackages.txt"
 
-
-
 #check if the nugetPackageVersionsFile exists
 if [[ -f ${nugetPackageVersionsFilePath} ]]; then
     sh 'Core-Scripts/CheeseModeUpdateNugetPackageVersions.sh' "$(<${nugetPackageVersionsFilePath})"
