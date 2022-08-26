@@ -10,7 +10,7 @@ source "$scriptPath/pressAnyKeyToContinue.sh"
 
 # #init the config variables
 # source "$scriptPath/../config.cfg"
-sh "$scriptPath/readConfig.sh" || { pressAnyKeyToContinue && { exit; }; }
+source "$scriptPath/readConfig.sh" || { pressAnyKeyToContinue && { exit; }; }
 
 #sets the title of the terminal window
 function setTerminalTitle(){
