@@ -10,6 +10,5 @@ nugetPackageNameStripped="${nugetPackageNameStripped// /_}"
 
 declare sourceBranchName="feature/updating_${nugetPackageNameStripped}_to_Release_${releaseNumber}"
 declare commitMessage="Updating NuGet package(s): $nugetPackageName to to version: $releaseNumber"
-declare ADOOrganization="npsnatgen/NPS"
 
-sh 'Core-Scripts/PushAllChangesAndCreateADOPullRequests.sh' "$sourceBranchName" "$commitMessage" "$ADOOrganization"
+sh 'Core-Scripts/PushAllChangesAndCreateADOPullRequests.sh' "$sourceBranchName" "$commitMessage"

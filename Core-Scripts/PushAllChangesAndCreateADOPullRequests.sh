@@ -175,10 +175,12 @@ sourceBranchName=$(createValidGitBranchName "$sourceBranchName")
 commitMessage=$(promptUserForValueIfEmpty "$2" "Please enter your commit message: ")
 
 #this will become part of the pull request creation URL.
-ADOOrganization=$(promptUserForValueIfEmpty "$3" "Please enter the Organization part of the Azure Devops URL: ")
+#ADOOrganization=$(promptUserForValueIfEmpty "$3" "Please enter the Organization part of the Azure Devops URL: ")
+#ADOOrganization is defined in the config file
 
 echo -e "the source branch name is:$LightYellow $sourceBranchName $NoColor"
 echo -e "the commit message is:$LightYellow $commitMessage $NoColor"
+echo -e "the ADOOrganization is:$LightYellow $ADOOrganization $NoColor"
 
 #ask the user to confirm if they want to continue
 shouldContinue=$(promptUserForYesOrNo "Do the source branch and commit messages look correct? (Y/N)" )
