@@ -53,20 +53,20 @@ function updateProjfileNuGetPackageVersion(){
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
     #these update the singleLine package refs
-    #<PackageReference Include="PLModels" Version="3.0.165" />
+    #<PackageReference Include="example.nuget.package" Version="3.0.165" />
     thingToMatch="(<PackageReference Include=\"${nuGetPackageName}\" Version=\").{1,}?(\".{0,}?\/>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
     #these update the "refrence" ones
-    #<Reference Include="PL.Contract.Standard, Version=3.0.165.0, Culture=neutral, processorArchitecture=MSIL">
+    #<Reference Include="example.nuget.package, Version=3.0.165.0, Culture=neutral, processorArchitecture=MSIL">
     thingToMatch="(<Reference Include=\"${nuGetPackageName}\"[^\n,]{1,}? Version=)[^\n,]{1,}?(<.{1,}?<\/Reference>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
 
     #these update the hintpath things
-    #<HintPath>$(SolutionDir)\packages\PL.Contract.Standard.3.0.165\lib\netstandard2.0\PL.Contract.Standard.dll</HintPath>
+    #<HintPath>$(SolutionDir)\packages\example.nuget.package.3.0.165\lib\netstandard2.0\example.nuget.package.dll</HintPath>
     thingToMatch="(<HintPath[^>]{1,}>${nuGetPackageName})[^\\/ ]{1,}?(<.{1,}?<\/HintPath>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
