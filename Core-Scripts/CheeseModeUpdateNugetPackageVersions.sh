@@ -58,6 +58,25 @@ function updateProjfileNuGetPackageVersion(){
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
+    #these update the "refrence" ones
+    #<Reference Include="PL.Contract.Standard, Version=3.0.165.0, Culture=neutral, processorArchitecture=MSIL">
+    thingToMatch="(<Reference Include=\"${nuGetPackageName}\"[^\n,]{1,}? Version=)[^\n,]{1,}?(<.{1,}?<\/Reference>)"
+    thingToChangeItTo="\${1}${newVersion}\$2"
+    findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
+
+
+    #these update the hintpath things
+    #<HintPath>$(SolutionDir)\packages\PL.Contract.Standard.3.0.165\lib\netstandard2.0\PL.Contract.Standard.dll</HintPath>
+    thingToMatch="(<HintPath[^>]{1,}>${nuGetPackageName})[^\\/ ]{1,}?(<.{1,}?<\/HintPath>)"
+    thingToChangeItTo="\${1}${newVersion}\$2"
+    findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
+
+    #updating the 
+    #<package id="PL.Contract.Standard" version="3.0.165" targetFramework="net47" />
+    thingToMatch="(<package id=\"${nuGetPackageName}\" Version=\").{1,}?(\".{0,}?\/>)"
+    thingToChangeItTo="\${1}${newVersion}\$2"
+    findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
+
 }
 
 #in the current repo, update all the projFiles to have newer nugetPackage versions
