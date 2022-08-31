@@ -2,11 +2,8 @@
 declare scriptPath
 scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 
-#init the pretty colors
-source "$scriptPath/prettyColors.sh"
-
-#press the any key
-source "$scriptPath/pressAnyKeyToContinue.sh"
+#"import" common functions
+source "$scriptPath/commonUtils.sh"
 
 # #init the config variables
 # source "$scriptPath/../config.cfg"
@@ -64,7 +61,6 @@ function updateProjfileNuGetPackageVersion(){
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
-
     #these update the hintpath things
     #<HintPath>$(SolutionDir)\packages\example.nuget.package.3.0.165\lib\netstandard2.0\example.nuget.package.dll</HintPath>
     thingToMatch="(<HintPath[^>]{1,}>${nuGetPackageName})[^\\/ ]{1,}?(<.{1,}?<\/HintPath>)"
@@ -76,7 +72,6 @@ function updateProjfileNuGetPackageVersion(){
     thingToMatch="(<package id=\"${nuGetPackageName}\" Version=\").{1,}?(\".{0,}?\/>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
-
 }
 
 #in the current repo, update all the projFiles to have newer nugetPackage versions
