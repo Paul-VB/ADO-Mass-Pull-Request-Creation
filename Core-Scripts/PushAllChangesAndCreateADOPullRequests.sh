@@ -2,58 +2,17 @@
 declare scriptPath
 scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 
-#init the pretty colors
-source "$scriptPath/prettyColors.sh"
-
-#press the any key
-source "$scriptPath/pressAnyKeyToContinue.sh"
+#"import" common functions
+source "$scriptPath/commonUtils.sh"
 
 # #init the config variables
 # source "$scriptPath/../config.cfg"
 source "$scriptPath/readConfig.sh" || { pressAnyKeyToContinue && { exit; }; }
 
-#sets the title of the terminal window
-function setTerminalTitle(){
-    echo -ne "\e]0;${1}\a"
+#executes the checkChange script
+function checkChanges(){
+    "$scriptPath/checkChanges.sh"
 }
-
-#given a variable, return that variable if it is not empty.
-#If it is empty, prompt the user to enter it with a custom message
-function promptUserForValueIfEmpty(){
-    #check if we actually recieved the cli argument
-    if [ -z "$1" ];
-    then
-        read -r -p "$2" result
-        echo "$result"
-    else
-        echo "$1"
-    fi 
-}
-
-#asks the user a yes or no question
-function promptUserForYesOrNo(){
-    local prompt
-    prompt="$1"
-    while true
-        do
-        read -r -p "$prompt [Y/n]" input
-        case $input in
-        [yY][eE][sS]|[yY])
-            echo "True"
-        break
-        ;;
-        [nN][oO]|[nN])
-            echo "False"
-        break
-        ;;
-        *)
-            echo "Invalid input..." >&2
-        ;;
-        esac
-    done
-}
-
-
 
 #given a string, return that string such that it could be used as a valid git branch name
 #with invalid characters stripped out or replaced
@@ -63,35 +22,6 @@ function createValidGitBranchName(){
     result="${result//,/_}"
     result="${result// /_}"
     echo "$result"
-}
-
-#get the default branch name of the current repository
-function getDefaultBranchName(){
-    echo "$(eval "git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'")"
-}
-
-#get the current branch name of the current repository
-function getCurrentBranchName(){
-    echo "$(eval "git symbolic-ref HEAD | sed 's@^refs/heads/@@'")"
-}
-
-touch "$tempDir/ReposWithChangesTmpFile"
-#this function checks a directory, and if it's a git repo with unmerged changes, add that directory to gitRepoHasUnmergedChanges
-function checkIfDirectoryIsGitRepoWithUnmergedChanges(){
-    local currDirectory=${1}
-    eval cd \"$currDirectory\" || { true; }; #the `|| { true; };` code basically says "do a command, but if it errors, do nothing"
-	if [ -d .git ]; then
-        #we know we're in a git repo. Does the git repo have unmerged changes?
-        if output=$(git status --porcelain) && [ -z "$output" ]; then
-			# Working directory clean
-            echo -ne $LightGreen"\r\033[0K$currDirectory has no changes"$NoColor;
-		else 
-			# Uncommitted changes
-			echo -e $LightRed"\r\033[0K$currDirectory has changes"$NoColor;
-			echo "$currDirectory" >> "$tempDir/ReposWithChangesTmpFile"
-		fi
-	fi
-	cd ..; 
 }
 
 #this function takes a directory that is known to be a git repo with unmerged changes.
@@ -163,11 +93,9 @@ function branchAndCreatePR(){
 }
 
 #where "main" starts
-declare scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 declare currDate="$(date +"%Y-%m-%d_%H-%M-%S")";
 
 setTerminalTitle "Push All Changes"
-
 #this is the source branch name that all our commits will use
 sourceBranchName=$(promptUserForValueIfEmpty "$1" "Please Enter your source branch name: ")
 sourceBranchName=$(createValidGitBranchName "$sourceBranchName")
@@ -195,16 +123,7 @@ fi
 declare PrListFilePath="PR List For ${commitMessage}_${currDate}.txt"
 
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
-eval cd \"$gitRoot\" || { exit; };
-for currDirectory in */ ; do 
-    #haha parallelization go brr
-    currDirectory=${currDirectory::-1} #this strips off the trailing /
-    checkIfDirectoryIsGitRepoWithUnmergedChanges $currDirectory &
-done 
-wait
-mapfile -t ReposWithChanges < "$tempDir/ReposWithChangesTmpFile"
-echo -e "\nChecked all repos";
-rm "$tempDir/ReposWithChangesTmpFile"
+mapfile -t ReposWithChanges <<< "$(checkChanges)"
 
 declare ReposWithChangesCount=${#ReposWithChanges[*]}
 
@@ -214,7 +133,8 @@ if [[ "$ReposWithChangesCount" -eq "0" ]]; then
 else
     echo "Get ready for git spam..."
     for repo in "${ReposWithChanges[@]}" ; do 
-        branchAndCreatePR $repo &
+        echo "dirty repo $repo"
+        #branchAndCreatePR $repo &
     done 
     wait
 fi
