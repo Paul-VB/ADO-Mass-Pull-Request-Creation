@@ -3,7 +3,7 @@ declare scriptPath
 scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 
 #press the any key
-source "$scriptPath/Core-Scripts/pressAnyKeyToContinue.sh"
+source "$scriptPath/Core-Scripts/commonUtils.sh"
 
 nugetPackageVersionsFilePath="./NuGetPackages.txt"
 
