@@ -133,8 +133,7 @@ if [[ "$ReposWithChangesCount" -eq "0" ]]; then
 else
     echo "Get ready for git spam..."
     for repo in "${ReposWithChanges[@]}" ; do 
-        echo "dirty repo $repo"
-        #branchAndCreatePR $repo &
+        branchAndCreatePR $repo &
     done 
     wait
 fi
