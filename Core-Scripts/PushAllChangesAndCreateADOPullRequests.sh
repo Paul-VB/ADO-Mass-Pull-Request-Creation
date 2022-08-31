@@ -126,7 +126,7 @@ declare PrListFilePath="PR List For ${commitMessage}_${currDate}.txt"
 mapfile -t ReposWithChanges <<< "$(checkChanges)"
 
 declare ReposWithChangesCount=${#ReposWithChanges[*]}
-
+eval cd \"$gitRoot\" || { true; };
 echo "Number of Repos with changes: $ReposWithChangesCount"
 if [[ "$ReposWithChangesCount" -eq "0" ]]; then
     echo -e "All repos are clean!";
