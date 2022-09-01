@@ -11,13 +11,15 @@ source "$scriptPath/readConfig.sh" || { pressAnyKeyToContinue && { exit; }; }
 
 #this function finds all the vbproj and csproj files in the current directory
 function findAllProjFilesInCurrentRepo(){
-    local fileNamePattern
-    fileNamePattern="*.[vc][bs]proj"
-    local searchResults
-    searchResults="$(find "$(pwd -P)" -type f -name "${fileNamePattern}")"
-    if [[ -n $searchResults ]]; then #this is here to prevent echoing out blank lines
-        echo -e "$searchResults"
-    fi
+    local -a fileNamePatterns
+    fileNamePatterns=("*.vbproj" "*.csproj" "packages.config")
+    for currFileNamePattern in "${fileNamePatterns[@]}"; do
+        local searchResults
+        searchResults="$(find "$(pwd -P)" -type f -name "${currFileNamePattern}")"
+        if [[ -n $searchResults ]]; then #this is here to prevent echoing out blank lines
+            echo -e "$searchResults"
+        fi
+    done
 }
 
 #for a given file, find and replace in-place a provided regexString (thingToMatch) with a replacement string (thingToChangeItTo)
@@ -154,8 +156,7 @@ populateDictFromNewlineSeparatedStrings "${1}" nuGetPackageVersionsDict
 
 echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
 
-#updateAllProjFiles
-updateProjfileAllNugetPackages "C:\Git\NGIC.Standard.Ecomm.Api\src\NGIC.Standard.Ecomm.Api\NGIC.Standard.Ecomm.Api.csproj"
+updateAllProjFiles
 wait
 echo "finished"
 date -ud "@$SECONDS" "+Time elapsed: %H:%M:%S" #i dont know why this works, but it works
