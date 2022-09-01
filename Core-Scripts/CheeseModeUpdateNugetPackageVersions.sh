@@ -68,8 +68,8 @@ function updateProjfileNuGetPackageVersion(){
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
     #updating the 
-    #<package id="PL.Contract.Standard" version="3.0.165" targetFramework="net47" />
-    thingToMatch="(<package id=\"${nuGetPackageName}\" Version=\").{1,}?(\".{0,}?\/>)"
+    #<package id="example.nuget.package" version="3.0.165" targetFramework="net47" />
+    thingToMatch="(<package id=\"${nuGetPackageName}\".{0,}?Version=\").{1,}?(\".{0,}?\/>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 }
