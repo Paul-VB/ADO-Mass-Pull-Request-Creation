@@ -146,7 +146,7 @@ populateDictFromNewlineSeparatedStrings "${1}" nuGetPackageVersionsDict
 
 echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
 
-#updateAllRepos
+updateAllRepos
 echo "finished"
 date -ud "@$SECONDS" "+Time elapsed: %H:%M:%S" #i dont know why this works, but it works
 
