@@ -28,7 +28,7 @@ function findAndReplaceInFile(){
     thingToMatch="${2}"
     local thingToChangeItTo
     thingToChangeItTo="${3}"
-    perl -w -i -p -00e "s/${thingToMatch}/${thingToChangeItTo}/gsi" "$filePath"
+    perl -w -i -p -00e "s/${thingToMatch}/${thingToChangeItTo}/gs" "$filePath"
 }
 
 #for a given projfile, update the given nugetpackage to the given newVersion
@@ -69,7 +69,7 @@ function updateProjfileNuGetPackageVersion(){
 
     #updating the 
     #<package id="example.nuget.package" version="3.0.165" targetFramework="net47" />
-    thingToMatch="(<package id=\"${nuGetPackageName}\".{0,}?Version=\").{1,}?(\".{0,}?\/>)"
+    thingToMatch="(<package id=\"${nuGetPackageName}\".{0,}?version=\").{1,}?(\".{0,}?\/>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 }
