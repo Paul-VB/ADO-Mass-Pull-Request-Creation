@@ -57,7 +57,7 @@ function updateProjfileNuGetPackageVersion(){
 
     #these update the "refrence" ones
     #<Reference Include="example.nuget.package, Version=3.0.165.0, Culture=neutral, processorArchitecture=MSIL">
-    thingToMatch="(<Reference Include=\"${nuGetPackageName}\"[^\n,]{1,}? Version=)[^\n,]{1,}?(<.{1,}?<\/Reference>)"
+    thingToMatch="(<Reference Include=.{0,}?${nuGetPackageName}[^\n]{1,}? Version=)[^\n,]{1,}(.{1,}?<\/Reference>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
