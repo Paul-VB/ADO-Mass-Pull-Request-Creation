@@ -10,7 +10,7 @@ source "$scriptPath/commonUtils.sh"
 source "$scriptPath/readConfig.sh" || { pressAnyKeyToContinue && { exit; }; }
 
 #this function finds all the vbproj and csproj files in the current directory
-function findAllProjFiles(){
+function findAllProjFilesInCurrentRepo(){
     local fileNamePattern
     fileNamePattern="*.[vc][bs]proj"
     local searchResults
@@ -29,6 +29,18 @@ function findAndReplaceInFile(){
     local thingToChangeItTo
     thingToChangeItTo="${3}"
     perl -w -i -p -00e "s/${thingToMatch}/${thingToChangeItTo}/gs" "$filePath"
+}
+
+#for a given projfile, update all the nugetPackages listed in nuGetPackageVersionsDict
+function updateProjfileAllNugetPackages(){
+    local projFile
+    projFile="${1}"
+    for key in "${!nuGetPackageVersionsDict[@]}"; do
+        local currNugetPackage=${key}
+        local newPackageVersion=${nuGetPackageVersionsDict[$key]}
+        updateProjfileNuGetPackageVersion "${projFile}" "${currNugetPackage}" "${newPackageVersion}"
+    done
+    echo "${projFile} has been updated"
 }
 
 #for a given projfile, update the given nugetpackage to the given newVersion
@@ -74,34 +86,30 @@ function updateProjfileNuGetPackageVersion(){
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 }
 
-#in the current repo, update all the projFiles to have newer nugetPackage versions
-function updateCurrentRepo(){
+#Updates all proj files that are inside of repos in the git root folder
+function updateAllProjFiles(){
     #we know we're in a git repo.
-    #local -a projFiles
-    #projFiles=(" $(findAllProjFiles) ")
+    echo "Searching for all proj files in ${gitRoot}..."
     readarray -t projFiles <<< "$(findAllProjFiles)"
+    declare numberOfProjFiles=${#projFiles[*]}
+    echo "${numberOfProjFiles} proj files found."
     # mapfile -t projFiles < "$(findAllProjFiles)"
     for currProjFile in "${projFiles[@]}"; do
         if [[ -f $currProjFile ]]; then
-
-            for key in "${!nuGetPackageVersionsDict[@]}"; do
-                currNugetPackage=${key}
-                newPackageVersion=${nuGetPackageVersionsDict[$key]}
-                updateProjfileNuGetPackageVersion "${currProjFile}" "${currNugetPackage}" "${newPackageVersion}"
-            done
-        echo "$currProjFile has been updated"
+            updateProjfileAllNugetPackages "$currProjFile"&
         fi
     done
+    wait
 }
 
-#this function loops through all the folders in the current directory. If that folder is a git repo, then begin updating it's nugetPackage versions
-function updateAllRepos(){
+#for every repo, find the full path of every single proj file
+function findAllProjFiles(){
     eval cd \"$gitRoot\" || { true; };
     for currDirectory in */ ; do 
         currDirectory=${currDirectory::-1} #this strips off the trailing /
         eval cd \"$currDirectory\" || { true; };
         if [ -d .git ]; then
-            updateCurrentRepo &
+            findAllProjFilesInCurrentRepo &
         fi
         cd ..; 
     done 
@@ -146,7 +154,8 @@ populateDictFromNewlineSeparatedStrings "${1}" nuGetPackageVersionsDict
 
 echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
 
-updateAllRepos
+updateAllProjFiles
+wait
 echo "finished"
 date -ud "@$SECONDS" "+Time elapsed: %H:%M:%S" #i dont know why this works, but it works
 
