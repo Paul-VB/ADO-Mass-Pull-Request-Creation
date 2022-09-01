@@ -28,7 +28,7 @@ function findAndReplaceInFile(){
     thingToMatch="${2}"
     local thingToChangeItTo
     thingToChangeItTo="${3}"
-    perl -w -i -p -00e "s/${thingToMatch}/${thingToChangeItTo}/gs" "$filePath"
+    perl -w -i -p -00e "s/${thingToMatch}/${thingToChangeItTo}/gsi" "$filePath"
 }
 
 #for a given projfile, update the given nugetpackage to the given newVersion
