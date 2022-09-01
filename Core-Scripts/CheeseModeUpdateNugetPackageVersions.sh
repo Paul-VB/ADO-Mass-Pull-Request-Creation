@@ -63,7 +63,7 @@ function updateProjfileNuGetPackageVersion(){
 
     #these update the hintpath things
     #<HintPath>$(SolutionDir)\packages\example.nuget.package.3.0.165\lib\netstandard2.0\example.nuget.package.dll</HintPath>
-    thingToMatch="(<HintPath[^>]{1,}>${nuGetPackageName})[^\\/ ]{1,}?(<.{1,}?<\/HintPath>)"
+    thingToMatch="(<HintPath[^>]{0,}?>.{0,}?${nuGetPackageName}.)[^\\/ ]{1,}(.{0,}?<\/HintPath>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
@@ -108,6 +108,11 @@ function updateAllRepos(){
     wait
 }
 
+function testy(){
+    updateProjfileNuGetPackageVersion "$scriptPath/test.txt" "PL.Contract.Standard" "3.0.174"
+
+}
+
 #this function takes as input key/value pairs from a string and populates a supplied dictionary in-place.
 #The KVPs are separated by newlines, and the keys are delimited from the values by commas. and returns a dictionary
 #the main use of this function is basicallyy to cat in a file contents and spit out a dictionary
@@ -146,7 +151,8 @@ populateDictFromNewlineSeparatedStrings "${1}" nuGetPackageVersionsDict
 
 echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
 
-updateAllRepos
+#updateAllRepos
+testy
 echo "finished"
 date -ud "@$SECONDS" "+Time elapsed: %H:%M:%S" #i dont know why this works, but it works
 
