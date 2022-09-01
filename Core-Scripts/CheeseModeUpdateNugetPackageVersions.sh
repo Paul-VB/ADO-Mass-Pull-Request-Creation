@@ -75,7 +75,7 @@ function updateProjfileNuGetPackageVersion(){
 
     #these update the hintpath things
     #<HintPath>$(SolutionDir)\packages\example.nuget.package.3.0.165\lib\netstandard2.0\example.nuget.package.dll</HintPath>
-    thingToMatch="(<HintPath[^>]{0,}?>.{0,}?${nuGetPackageName}.)[^\\/ ]{1,}(.{0,}?<\/HintPath>)"
+    thingToMatch="(<HintPath[^>]{0,}?>.{0,}?${nuGetPackageName}.)[^\s\\\\\/]{1,}(.{0,}?<\/HintPath>)"
     thingToChangeItTo="\${1}${newVersion}\$2"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
@@ -154,7 +154,8 @@ populateDictFromNewlineSeparatedStrings "${1}" nuGetPackageVersionsDict
 
 echo "replacing old version numbers with new version numbers. this might take a minute, and slow down your computer..."
 
-updateAllProjFiles
+#updateAllProjFiles
+updateProjfileAllNugetPackages "C:\Git\NGIC.Standard.Ecomm.Api\src\NGIC.Standard.Ecomm.Api\NGIC.Standard.Ecomm.Api.csproj"
 wait
 echo "finished"
 date -ud "@$SECONDS" "+Time elapsed: %H:%M:%S" #i dont know why this works, but it works
