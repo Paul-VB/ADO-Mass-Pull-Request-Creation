@@ -1,19 +1,20 @@
 #!/bin/bash
+declare scriptPath
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )";
 
-#get the default branch name of the current repository
-function getDefaultBranchName(){
-    echo "$(eval "git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'")"
-}
+#"import" common functions
+source "${scriptPath}/../Core-Scripts/commonUtils.sh"
 
-#get the current branch name of the current repository
-function getCurrentBranchName(){
-    echo "$(eval "git symbolic-ref HEAD | sed 's@^refs/heads/@@'")"
-}
+getDefaultBranchName
 
 #resets to the default branch, and pulls
 function reset(){
-    eval "git reset --hard origin ${getDefaultBranchName}"
-    #eval "git pull"
+    local defaultBranchName
+    defaultBranchName="$(getDefaultBranchName)"
+    eval "git checkout ${defaultBranchName}"
+    eval "git reset --hard ${defaultBranchName}"
+    eval "git pull"
+    eval "git clean -f"
 }
 
 gitRoot="C:\git";
@@ -26,3 +27,4 @@ for d in */ ; do
 	fi
     cd ..; 
 done 
+wait
