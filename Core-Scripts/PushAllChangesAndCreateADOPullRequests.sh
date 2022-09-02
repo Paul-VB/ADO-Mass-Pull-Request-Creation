@@ -74,7 +74,7 @@ function createADOPullRequest(){
     currentBranchName=$(getCurrentBranchName)
     targetBranchName=$(getDefaultBranchName)
     newPrUrl="https://dev.azure.com/${ADOOrganization}/_git/${repo}/pullrequestcreate?sourceRef=${currentBranchName}&targetRef=${targetBranchName}"
-    echo $newPrUrl >> "$scriptPath/$PrListFilePath"
+    echo $newPrUrl >> "${PrListFilePath}"
     eval "start $newPrUrl"
 }
 
@@ -120,7 +120,8 @@ if [[ "$shouldContinue" == "False" ]]; then
 fi
 
 #this will be where the list of pull request links will be placed.
-declare PrListFilePath="PR List For ${commitMessage}_${currDate}.txt"
+declare PrListFilePath="${scriptPath}/../PR_List_For_${currDate}.txt"
+touch "${PrListFilePath}"
 
 #now we analyze all the folders in the git base folder to see which of them are actually git repos
 mapfile -t ReposWithChanges <<< "$(checkChanges)"
