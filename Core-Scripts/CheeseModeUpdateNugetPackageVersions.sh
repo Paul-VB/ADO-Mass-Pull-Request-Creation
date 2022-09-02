@@ -77,8 +77,8 @@ function updateProjfileNuGetPackageVersion(){
 
     #these update the hintpath things
     #<HintPath>$(SolutionDir)\packages\example.nuget.package.3.0.165\lib\netstandard2.0\example.nuget.package.dll</HintPath>
-    thingToMatch="(<HintPath[^>]{0,}?>.{0,}?${nuGetPackageName}.)[^\s\\\\\/]{1,}(.{0,}?<\/HintPath>)"
-    thingToChangeItTo="\${1}${newVersion}\$2"
+    thingToMatch="(<HintPath[^>]{0,}?>.{0,}?${nuGetPackageName}.)(([\.\d][^a-zA-Z]){1,})(.{0,}?<\/HintPath>)"
+    thingToChangeItTo="\${1}${newVersion}\$4"
     findAndReplaceInFile "${projFile}" "${thingToMatch}" "${thingToChangeItTo}"
 
     #updating the 
